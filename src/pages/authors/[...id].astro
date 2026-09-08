@@ -3,6 +3,7 @@ import AuthorCard from "@/components/AuthorCard.astro"
 import BlogCard from "@/components/BlogCard.astro"
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
+import { baseUrl } from "@/lib/utils"
 import { getPosts } from "@/lib/content"
 import { getCollection, type CollectionEntry } from "astro:content"
 
@@ -24,7 +25,7 @@ const posts = (await getPosts()).filter((post) =>
 )
 ---
 
-<Layout crumbs={[{ label: name, href: `/authors/${author.id}` }]}>
+<Layout crumbs={[{ label: name, href: `${baseUrl}authors/${author.id}` }]}>
   <MetaPage slot="head" title={`${name} (Author)`} description={bio} noindex />
   <header>
     <ul>

@@ -2,7 +2,7 @@
 import Logo from "@/assets/logo.svg"
 import ThemeToggle from "@/components/ThemeToggle.astro"
 import { NAVIGATION, SITE } from "@/consts"
-import { normalizePath } from "@/lib/utils"
+import { baseUrl, normalizePath } from "@/lib/utils"
 
 type Props = { crumbs?: { label: string; href: string }[] }
 
@@ -15,7 +15,7 @@ const section = NAVIGATION.find(
 
 <aside data-bar>
   <sidebar-inner>
-    <a href="/" aria-label={SITE.title}>
+    <a href={baseUrl} aria-label={SITE.title}>
       <Logo />
       <span>{SITE.title}</span>
     </a>

@@ -1,6 +1,7 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
+import { baseUrl } from "@/lib/utils"
 ---
 
 <Layout>
@@ -46,7 +47,7 @@ import Layout from "@/layouts/Layout.astro"
           >GitHub</a
         >
         repository. To learn more about why this template exists, read this blog
-        post: <a href="/blog/introducing-v2">Introducing astro-erudite v2</a>.
+        post: <a href={`${baseUrl}blog/reflection-comparison`}>Comparing reflection capabilities between C++ and C3</a>.
       </p>
     </prose-content>
   </dictionary-entry>

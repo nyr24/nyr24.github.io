@@ -19,4 +19,12 @@ export const normalizePath = (pathname: string) => {
   }
 }
 
+export const baseUrl = (() => {
+  const base = import.meta.env.BASE_URL
+  return base.endsWith("/") ? base : `${base}/`
+})()
+
+export const rootPath = (path: string) =>
+  path.startsWith("/") ? `${baseUrl}${path.slice(1)}` : path
+
 export const hashId = (hash: string) => decodeURIComponent(hash.slice(1))
