@@ -13,7 +13,6 @@ import { headingAnchors } from "./src/lib/heading-anchors"
 
 export default defineConfig({
   site: "https://nyr24.github.io",
-  base: "/my-blog",
   compressHTML: true,
   prefetch: { prefetchAll: true },
   integrations: [
