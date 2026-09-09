@@ -6,22 +6,25 @@ authors:
   - nyr24
 ---
 
-<p>Reflection lets a program inspect and manipulate its own structure at runtime or compile time. Both C++ (with its upcoming reflection support) and C3 rely on compile-time reflection, so you can reason about types, enumerators, and struct members without any runtime cost. In this post I compare how the two languages approach this — walking through an enum-to-string helper and struct introspection side by side, and finishing with a bonus look at what C3's macro reflection can do beyond those basics.</p>
+<p>Reflection lets a program inspect and manipulate its own structure at runtime or compile time. Both C++ (with its upcoming reflection support) and C3 rely on compile-time reflection, so you can reason about types, enumerators, and struct members without any runtime cost. In this post I will compare how these two languages approach compile-time reflection.</p>
 
 ### What is C3?
 
 <p>
- C3 is a general-purpose programming language with systems-level performance.
- It builds on the syntax and semantics of the C language, bringing modern ergonomics and ease of development while remaining simple and familiar to C/C++ programmers.
+  C3 is a relatively new programming language which mainly focuses on readability, performance, minimalism and familiarity to C / C++ programmers.
+  <br/>
+  It doesn't have heavy runtime, garbage collection, exceptions or RAII.
+	<br/>
+	It also fully supports C ABI compatibility out of the box.
 </p>
-<p>C3 uses a special syntax for compile-time execution; this was done on purpose to explicitly show the reader which code runs at compile time.
-It uses macros for compile-time evalutation an reflection</p>
+<p>C3 uses special syntax for compile-time execution: all variables, control-flow constructs are prefixed with <b>$</b>. This was done on purpose to explicitly show the reader which code runs at compile time.
+It uses <b>macros</b> for compile-time evaluation and reflection.</p>
 
 <blockquote>
-C3 macros are designed to provide a replacement for C preprocessor macros. They extend such macros by providing compile time evaluation using constant folding, which offers an IDE friendly, limited, compile time execution.
+C3 macros are designed to provide a replacement for C preprocessor macros. They extend such macros by providing compile-time evaluation using constant folding, which offers an IDE friendly, limited, compile-time execution.
 </blockquote>
 
-Lets see both languages in action!
+Let's see both languages in action!
 
 ### Enum to string conversion
 
@@ -54,19 +57,19 @@ enum Color { RED, GREEN, BLUE }
 
 macro String enum_to_string($enum_val)
 {
-	var $EnumType = $Typeof($enum_val);
-	$foreach $val : $EnumType::values:
-		$if $val == $enum_val:
-			return $val.description;
-		$endif
-	$endforeach
+		var $EnumType = $Typeof($enum_val);
+		$foreach $val : $EnumType::values:
+				$if $val == $enum_val:
+						return $val.description;
+				$endif
+		$endforeach
 }
 
 fn void main()
 {
-	Color $color = RED;
-	String $color_name = enum_to_string($color);
-	io::printfn("%s", $color_name);
+		Color $color = RED;
+		String $color_name = enum_to_string($color);
+		io::printfn("%s", $color_name);
 }
 ```
 
@@ -89,7 +92,7 @@ fn void log_color(Color c)
 }
 ```
 
-But lets proceed with reflections!
+Let's proceed with reflections!
 
 ### Struct introspection
 
@@ -133,30 +136,29 @@ struct Person
 	double height;
 }
 
-// (1)
 <*
- @require @kindof($val) == STRUCT : "Expected a struct"
+ @require @kindof($val) == STRUCT : "Expected a struct" // (1)
 *>
 macro void print_struct_fields($val)
 {
-	var $Type = $Typeof($val);
-	$foreach $field : $Type::members:
-		io::printfn("\t%s: %s", $field.name, $val.$field);
-	$endforeach
+		var $Type = $Typeof($val);
+		$foreach $field : $Type::members:
+				io::printfn("\t%s: %s", $field.name, $val.$field);
+		$endforeach
 }
 
 fn void main()
 {
-  Person $alice = {"Alice Smith", 30, 1.75};
-	io::printfn("Person details: ");
-	print_struct_fields($alice);
-	/*
-    Outputs:
-		Person details:
-		name: Alice Smith
-		age: 30
-		height: 1.750000
-	*/
+	  Person $alice = {"Alice Smith", 30, 1.75};
+		io::printfn("Person details: ");
+		print_struct_fields($alice);
+		/*
+	    Outputs:
+			Person details:
+			name: Alice Smith
+			age: 30
+			height: 1.750000
+		*/
 }
 ```
 <p>
@@ -179,16 +181,16 @@ struct Config
 template<typename T>
 consexpr bool validate(const T& obj)
 {
-	constexpr auto context = std::meta::access_context::current();
-	template for (constexpr auto member: define_static_array(
-		nonstatic_data_members_of(^^T, context)) {
-		template for (constexpr auto annotation : define_static_array(
-			annotations_of_with_type(member, ^^Range))) {
-			auto [lo, hi] = extract<Range>(annotation);
-			if (obj.[:member:] < lo) return false;
-			else if (obj.[:member:] > hi) return false;
-		})
-	return true;
+		constexpr auto context = std::meta::access_context::current();
+		template for (constexpr auto member: define_static_array(
+				nonstatic_data_members_of(^^T, context)) {
+				template for (constexpr auto annotation : define_static_array(
+						annotations_of_with_type(member, ^^Range))) {
+						auto [lo, hi] = extract<Range>(annotation);
+						if (obj.[:member:] < lo) return false;
+						else if (obj.[:member:] > hi) return false;
+				})
+		return true;
 }
 
 static_assert(validate(Config{ 1000, 50, 20000 }));
@@ -216,15 +218,15 @@ macro ValidationResult validate_comptime($obj) @const
     var $Type = $Typeof($obj);
 
     $foreach $field : $Type::members:
-      $if $field.has_tag("range"):
-        Range $r = $field.get_tag("range");
-        $if $obj.$field < $r.lo:
-					return TO_LOW;
+	      $if $field.has_tag("range"):
+		        Range $r = $field.get_tag("range");
+		        $if $obj.$field < $r.lo:
+								return TO_LOW;
+						$endif
+		        $if $obj.$field > $r.hi:
+								return TO_HIGH;
+						$endif
 				$endif
-        $if $obj.$field > $r.hi:
-					return TO_HIGH;
-				$endif
-			$endif
 		$endforeach
     return SUCCESS;
 }
@@ -272,6 +274,15 @@ which code gets expanded at compile-time and which will execute at runtime.
 
 ### Conclusions
 
-<p>Both languages can do real compile-time reflection, which is great for serializers, debug printers, and generic helpers like the ones above.<br/>The tradeoff is ergonomics: C++ gets the power via verbose template machinery and splices, while C3 makes the same ideas more readable and expressive through its macro system.</p>
+<p>
+  Both languages can do real compile-time reflection, which is great for serializers, debug printers, and generic helpers like the ones above.<br/>The tradeoff is ergonomics: C++ gets the power via verbose template machinery and splices,
+  while C3 makes the same ideas more readable and expressive through its macro system and special syntax for compile-time execution,
+  it's very easy to understand where code will execute at compile time and where it wouldn't.
+</p>
+<p>
+  I've found C3 as very promising systems programming language, and I will do more posts about it soon.
+  <br/>
+  <b>Stay tuned!</b>
+</p>
 <p>You can search for more info about C3 on <a href="https://c3-lang.org">the main website</a>.
 <br/>Want to discuss the language or have a question? Join official <a href="https://discord.gg/qN76R87">C3 server on Discord.</a></p>

@@ -13,7 +13,7 @@
   --leading-offset: 0.65rem;
 
   --prose-foreground: color-mix(in oklab, var(--foreground) 80%, transparent);
-  --prose-marker:     color-mix(in oklab, var(--foreground) 30%, transparent);
+  --prose-marker: color-mix(in oklab, var(--foreground) 30%, transparent);
 
   --measure: 40rem;
 }
@@ -56,19 +56,17 @@ prose-content {
   text-wrap: pretty;
   overflow-wrap: break-word;
 
-  :where(
-      p,
-      ul,
-      ol,
-      blockquote,
-      pre,
-      table,
-      figure,
-      hr,
-      details,
-      math-display,
-      .expressive-code
-    ) {
+  :where(p,
+    ul,
+    ol,
+    blockquote,
+    pre,
+    table,
+    figure,
+    hr,
+    details,
+    math-display,
+    .expressive-code) {
     margin-block: 0 1em;
   }
 
