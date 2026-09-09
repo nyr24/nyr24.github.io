@@ -1,6 +1,6 @@
 ---
-title: "Comparing reflection capabilities between C++ and C3"
-description: "Comparing reflection capabilities between C++ and C3"
+title: "Comparing reflection capabilities of C++ and C3"
+description: "Comparing reflection capabilities of C++ and C3"
 date: 2026-09-09
 authors:
   - nyr24
