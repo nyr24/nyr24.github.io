@@ -78,7 +78,7 @@ For example this code: <code>io::printfn("%s", Color.RED)</code> will output RED
 <br/>
 If you want to take the underlying value from an enum you can either access <code>.ordinal</code> or cast it to the underlying type.
 <br/>
-You can also associate value of any type with your enumerators:
+You can also associate values of any type with your enumerators:
 ```c3
 enum Color : uint (String str_repr, char amount_of_red)
 {
